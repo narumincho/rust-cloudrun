@@ -1,0 +1,9 @@
+vscode:
+  extensions:
+    - mhutchie.git-graph
+    - rust-lang.rust-analyzer
+    - bungcip.better-toml
+
+tasks:
+  - name: start
+    command: cargo run
