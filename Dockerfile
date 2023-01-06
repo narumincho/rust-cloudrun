@@ -4,4 +4,4 @@ COPY [".", "."]
 
 RUN ["cargo", "build", "--release", "--all-features"]
 
-CMD [ "./target/release/deno-cloudrun" ]
+CMD [ "./target/release/webauthn-test" ]
