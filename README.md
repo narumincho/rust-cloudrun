@@ -1,6 +1,6 @@
-# webauthn-test
+# rust-cloudrun
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/narumincho/webauthn-test)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/narumincho/rust-cloudrun)
 
 GitHub でプライベートのメールアドレスを使っている場合のメール設定コマンドの例 (GitPod)
 
