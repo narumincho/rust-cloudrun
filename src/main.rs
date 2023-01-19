@@ -5,7 +5,7 @@ async fn hello_world(
         .uri()
         .path_and_query()
         .expect("パスを解析できなかった");
-    if path_and_query.path() == get_tower_png_path() {
+    if path_and_query.path() == TOWER_PNG_PATH {
         match http::Response::builder()
             .header(
                 http::header::CONTENT_TYPE,
@@ -50,7 +50,7 @@ background-color: black;
 ",
             chrono::Utc::now(),
             uuid::Uuid::new_v4(),
-            get_tower_png_path()
+            TOWER_PNG_PATH
         );
         match http::Response::builder()
             .header(
@@ -69,14 +69,7 @@ background-color: black;
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
 
-fn get_tower_png_path() -> String {
-    use sha2::Digest;
-
-    let mut sha256 = sha2::Sha256::new();
-    sha256.update(TOWER_PNG);
-    let path = format!("{:x}", sha256.finalize());
-    "/".to_string() + &path
-}
+const TOWER_PNG_PATH: &'static str = sha256_const::sha_256_hash_from_file_path!("/workspace/rust-cloudrun/assets/tower.png");
 
 #[tokio::main]
 async fn main() {

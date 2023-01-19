@@ -1,5 +1,5 @@
 [package]
-name = "webauthn-test"
+name = "rust-cloudrun"
 version = "0.1.0"
 edition = "2021"
 authors = ["narumincho"]
@@ -13,4 +13,4 @@ http = "0.2.8"
 http-body-util = "0.1.0-rc.1"
 uuid = { version = "1.2.2", features = ["v4"] }
 chrono = "0.4.23"
-sha2 = "0.10.6"
+sha256-const = {path = "./sha256-const" }

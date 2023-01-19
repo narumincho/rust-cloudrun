@@ -1,7 +1,13 @@
-FROM rust:latest
+FROM rust:latest as build
 
-COPY [".", "."]
+WORKDIR /app
 
-RUN ["cargo", "build", "--release", "--all-features"]
+COPY . .
 
-CMD [ "./target/release/webauthn-test" ]
+RUN cargo build --release --all-features
+
+FROM scratch
+
+COPY --from=build /app/target/release/rust-cloudrun /app/
+
+CMD /app/rust-cloudrun
