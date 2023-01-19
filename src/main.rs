@@ -69,7 +69,7 @@ background-color: black;
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
 
-const TOWER_PNG_PATH: &'static str = sha256_const::sha_256_hash_from_file_path!("/workspace/rust-cloudrun/assets/tower.png");
+const TOWER_PNG_PATH: &'static str = const_format::concatcp!("/", sha256_const::sha_256_hash_from_file_path!("/workspace/rust-cloudrun/assets/tower.png"));
 
 #[tokio::main]
 async fn main() {

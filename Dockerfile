@@ -1,13 +1,9 @@
 FROM rust:latest as build
 
-WORKDIR /app
+WORKDIR /workspace/rust-cloudrun/
 
 COPY . .
 
 RUN cargo build --release --all-features
 
-FROM scratch
-
-COPY --from=build /app/target/release/rust-cloudrun /app/
-
-CMD /app/rust-cloudrun
+CMD /workspace/rust-cloudrun/target/release/rust-cloudrun

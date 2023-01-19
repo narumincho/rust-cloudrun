@@ -10,7 +10,7 @@ pub fn sha_256_hash_from_file_path(input: proc_macro::TokenStream) -> proc_macro
 
                     let mut sha256 = sha2::Sha256::new();
                     sha256.update(vec);
-                    let hex_string = format!("/{:x}", sha256.finalize());
+                    let hex_string = format!("{:x}", sha256.finalize());
                     quote::quote! {
                         #hex_string
                     }.into()

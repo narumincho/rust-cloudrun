@@ -13,4 +13,5 @@ http = "0.2.8"
 http-body-util = "0.1.0-rc.1"
 uuid = { version = "1.2.2", features = ["v4"] }
 chrono = "0.4.23"
-sha256-const = {path = "./sha256-const" }
+sha256-const = { path = "./sha256-const" }
+const_format = "0.2.30"
