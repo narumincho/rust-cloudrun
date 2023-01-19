@@ -7,3 +7,5 @@ GitHub でプライベートのメールアドレスを使っている場合の�
 ```bash
 git config --global user.email 16481886+narumincho@users.noreply.github.com
 ```
+
+GitPod のバグのため. 報告されている ( https://github.com/gitpod-io/gitpod/issues/13323#issuecomment-1258232249 )

@@ -1,8 +1,26 @@
 async fn hello_world(
-    _req: http::Request<hyper::body::Incoming>,
+    request: http::Request<hyper::body::Incoming>,
 ) -> Result<hyper::Response<http_body_util::Full<hyper::body::Bytes>>, std::convert::Infallible> {
-    let html: String = format!(
-        "<!doctype html>
+    let path_and_query = request
+        .uri()
+        .path_and_query()
+        .expect("パスを解析できなかった");
+    if path_and_query.path() == get_tower_png_path() {
+        match http::Response::builder()
+            .header(
+                http::header::CONTENT_TYPE,
+                http::header::HeaderValue::from_static("image/png"),
+            )
+            .body(http_body_util::Full::from(TOWER_PNG))
+        {
+            Ok(response) => Ok(response),
+            Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
+                hyper::body::Bytes::from("error response"),
+            ))),
+        }
+    } else {
+        let html: String = format!(
+            "<!doctype html>
 <html lang=\"ja\">
 
 <head>
@@ -14,6 +32,10 @@ font-size: 48px;
 color: white;
 background-color: black;
 }}
+
+.image {{
+  width: 100%;
+}} 
 </style>
 </head>
 
@@ -21,25 +43,39 @@ background-color: black;
 <div>Rust のサーバーを起動できた!</div>
 <div>現在の時刻 {}</div>
 <div>ランダム {}</div>
+<img class=\"image\" src=\"{}\">
 </body>
 
 </html>
 ",
-        chrono::Utc::now(),
-        uuid::Uuid::new_v4()
-    );
-    match http::Response::builder()
-        .header(
-            http::header::CONTENT_TYPE,
-            http::header::HeaderValue::from_static("text/html"),
-        )
-        .body(http_body_util::Full::from(html))
-    {
-        Ok(response) => Ok(response),
-        Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
-            hyper::body::Bytes::from("error response"),
-        ))),
+            chrono::Utc::now(),
+            uuid::Uuid::new_v4(),
+            get_tower_png_path()
+        );
+        match http::Response::builder()
+            .header(
+                http::header::CONTENT_TYPE,
+                http::header::HeaderValue::from_static("text/html"),
+            )
+            .body(http_body_util::Full::from(html))
+        {
+            Ok(response) => Ok(response),
+            Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
+                hyper::body::Bytes::from("error response"),
+            ))),
+        }
     }
+}
+
+const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
+
+fn get_tower_png_path() -> String {
+    use sha2::Digest;
+
+    let mut sha256 = sha2::Sha256::new();
+    sha256.update(TOWER_PNG);
+    let path = format!("{:x}", sha256.finalize());
+    "/".to_string() + &path
 }
 
 #[tokio::main]
