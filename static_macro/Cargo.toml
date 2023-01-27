@@ -1,0 +1,12 @@
+[package]
+name = "static_macro"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.50"
+syn = "1.0.107"
+static_macro2 = { path = "../static_macro2" }

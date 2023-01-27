@@ -3,6 +3,7 @@ vscode:
     - mhutchie.git-graph
     - rust-lang.rust-analyzer
     - bungcip.better-toml
+    - vadimcn.vscode-lldb
 
 tasks:
   - name: start

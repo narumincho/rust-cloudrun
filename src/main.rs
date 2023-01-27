@@ -1,3 +1,5 @@
+use once_cell::sync::Lazy;
+
 async fn hello_world(
     request: http::Request<hyper::body::Incoming>,
 ) -> Result<hyper::Response<http_body_util::Full<hyper::body::Bytes>>, std::convert::Infallible> {
@@ -69,9 +71,7 @@ background-color: black;
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
 
-use once_cell::sync::Lazy;
-
-static TOWER_PNG_PATH: Lazy<String> = Lazy::new(|| {
+const TOWER_PNG_PATH: Lazy<String> = Lazy::new(|| {
     use sha2::Digest;
     let mut sha256 = sha2::Sha256::new();
     sha256.update(TOWER_PNG);
@@ -126,3 +126,7 @@ fn get_port_number_from_env_variable() -> u16 {
         }
     }
 }
+
+static_macro::custom!();
+
+const S: Lazy<Html> = Lazy::new(|| Html { ..HTML_DEFAULT });

@@ -13,7 +13,13 @@ http = "0.2.8"
 http-body-util = "0.1.0-rc.1"
 uuid = { version = "1.2.2", features = ["v4"] }
 chrono = "0.4.23"
-sha256-const = { path = "./sha256-const" }
+static_macro = { path = "./static_macro" }
 const_format = "0.2.30"
 sha2 = "0.10.6"
 once_cell = "1.17.0"
+
+[workspace]
+members = [
+    "static_macro",
+    "static_macro2"
+]
