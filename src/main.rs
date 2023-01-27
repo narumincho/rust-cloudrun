@@ -7,7 +7,7 @@ async fn hello_world(
         .uri()
         .path_and_query()
         .expect("パスを解析できなかった");
-    if path_and_query.path() == *TOWER_PNG_PATH {
+    if path_and_query.path() == TOWER_PNG_PATH {
         match http::Response::builder()
             .header(
                 http::header::CONTENT_TYPE,
@@ -52,7 +52,7 @@ background-color: black;
 ",
             chrono::Utc::now(),
             uuid::Uuid::new_v4(),
-            *TOWER_PNG_PATH
+            TOWER_PNG_PATH
         );
         match http::Response::builder()
             .header(
@@ -70,13 +70,6 @@ background-color: black;
 }
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
-
-const TOWER_PNG_PATH: Lazy<String> = Lazy::new(|| {
-    use sha2::Digest;
-    let mut sha256 = sha2::Sha256::new();
-    sha256.update(TOWER_PNG);
-    format!("/{:x}", sha256.finalize())
-});
 
 #[tokio::main]
 async fn main() {
