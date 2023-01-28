@@ -19,13 +19,6 @@ pub fn create_proc_macro2() -> proc_macro2::TokenStream {
         })
         .collect::<Vec<proc_macro2::TokenStream>>();
 
-    let tower_png_path: String = {
-        use sha2::Digest;
-        let mut sha256 = sha2::Sha256::new();
-        sha256.update(include_bytes!("../../assets/tower.png"));
-        format!("/{:x}", sha256.finalize())
-    };
-
     quote::quote! {
         struct Html {
             #(#struct_fields,)*
@@ -34,8 +27,6 @@ pub fn create_proc_macro2() -> proc_macro2::TokenStream {
         const HTML_DEFAULT: Html = Html {
             #(#default_fields,)*
         };
-
-        const TOWER_PNG_PATH: &'static str = #tower_png_path;
     }
 }
 
@@ -88,4 +79,15 @@ mod tests {
     fn sum() {
         assert_eq!((*crate::ATTRIBUTES).len(), 2)
     }
+}
+
+pub fn tower_png_path() -> proc_macro2::TokenStream {
+    let path: String = {
+        use sha2::Digest;
+        let mut sha256 = sha2::Sha256::new();
+        sha256.update(include_bytes!("../../assets/tower.png"));
+        format!("/{:x}", sha256.finalize())
+    };
+
+    quote::quote!(#path)
 }

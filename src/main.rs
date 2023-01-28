@@ -120,6 +120,8 @@ fn get_port_number_from_env_variable() -> u16 {
     }
 }
 
+const TOWER_PNG_PATH: &'static str = static_macro::tower_png_path!();
+
 static_macro::custom!();
 
 const S: Lazy<Html> = Lazy::new(|| Html { ..HTML_DEFAULT });
