@@ -1,17 +1,19 @@
-use faunadb::prelude::*;
-use futures::future::lazy;
-use futures::future::Future;
-use tokio::prelude;
+use async_std;
 
-fn main() {
-    let client = Client::builder("secret").build_sync().unwrap();
-    let query = Filter::new(
-        Lambda::new("x", Gt::new(Var::new("x"), 2)),
-        Array::from(vec![1, 2, 3]),
-    );
-
-    match client.query(query) {
-        Ok(response) => println!("{:#?}", response),
-        Err(error) => println!("Error: {:#?}", error),
-    }
+#[async_std::main]
+async fn main() -> Result<(), http_types::Error> {
+    let string = surf::post("https://db.us.fauna.com")
+        .header(
+            http_types::headers::AUTHORIZATION,
+            format!(
+                "{} {}",
+                http_types::auth::AuthenticationScheme::Bearer,
+                include_str!("../../secret.txt")
+            ),
+        )
+        .body("{\"get\":{\"collections\":null}}")
+        .recv_string()
+        .await?;
+    println!("{}", string);
+    Ok(())
 }
