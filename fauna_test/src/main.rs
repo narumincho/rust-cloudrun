@@ -1,10 +1,9 @@
 use std::str::FromStr;
 
-use async_std;
 use serde_json::json;
 
-#[async_std::main]
-async fn main() -> Result<(), http_types::Error> {
+#[tokio::main]
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let result = request(
         &include_str!("../../secret.txt"),
         &Expr::Collection(Box::new(Expr::StringLiteral("aaa".to_string()))),
@@ -15,17 +14,21 @@ async fn main() -> Result<(), http_types::Error> {
 }
 
 async fn request(secret_key: &str, query: &Expr) -> anyhow::Result<serde_json::value::Value> {
-    let string = surf::post("https://db.us.fauna.com")
+    let client = reqwest::Client::new();
+    let string = client
+        .post("https://db.us.fauna.com")
         .header(
-            http_types::headers::AUTHORIZATION,
+            reqwest::header::AUTHORIZATION,
             format!(
                 "{} {}",
                 http_types::auth::AuthenticationScheme::Bearer,
                 secret_key
             ),
         )
-        .body(expr_to_json_value(&query))
-        .recv_string()
+        .json(&expr_to_json_value(query))
+        .send()
+        .await?
+        .text()
         .await?;
     let json_value = serde_json::value::Value::from_str(string.as_str())?;
     Ok(json_value)
