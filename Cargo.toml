@@ -22,5 +22,7 @@ once_cell = "1.17.0"
 members = [
     "fauna_test",
     "static_macro",
-    "static_macro2"
+    "static_macro2",
+    "client",
+    "client_build"
 ]

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use async_std;
 use serde_json::json;
 
@@ -5,14 +7,14 @@ use serde_json::json;
 async fn main() -> Result<(), http_types::Error> {
     let result = request(
         &include_str!("../../secret.txt"),
-        &Expr::Get(Box::new(Expr::Collections)),
+        &Expr::Collection(Box::new(Expr::StringLiteral("aaa".to_string()))),
     )
     .await?;
     println!("{}", result);
     Ok(())
 }
 
-async fn request(secret_key: &str, query: &Expr) -> Result<String, http_types::Error> {
+async fn request(secret_key: &str, query: &Expr) -> anyhow::Result<serde_json::value::Value> {
     let string = surf::post("https://db.us.fauna.com")
         .header(
             http_types::headers::AUTHORIZATION,
@@ -25,17 +27,22 @@ async fn request(secret_key: &str, query: &Expr) -> Result<String, http_types::E
         .body(expr_to_json_value(&query))
         .recv_string()
         .await?;
-    Ok(string)
+    let json_value = serde_json::value::Value::from_str(string.as_str())?;
+    Ok(json_value)
 }
 
 enum Expr {
     Get(Box<Expr>),
     Collections,
+    Collection(Box<Expr>),
+    StringLiteral(String),
 }
 
 fn expr_to_json_value(expr: &Expr) -> serde_json::value::Value {
     match expr {
         Expr::Get(ref_expr) => json!({ "get": expr_to_json_value(ref_expr) }),
         Expr::Collections {} => json!({ "collections": null }),
+        Expr::Collection(name_expr) => json!({ "collection": expr_to_json_value(name_expr) }),
+        Expr::StringLiteral(value) => serde_json::value::Value::String(value.clone()),
     }
 }
