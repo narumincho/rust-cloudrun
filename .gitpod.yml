@@ -7,4 +7,4 @@ vscode:
 
 tasks:
   - name: start
-    command: cargo run
+    command: cargo run -p server
