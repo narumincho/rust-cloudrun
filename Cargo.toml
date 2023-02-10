@@ -4,5 +4,6 @@ members = [
     "static_macro",
     "static_macro2",
     "client",
+    "client_build",
     "server"
 ]
