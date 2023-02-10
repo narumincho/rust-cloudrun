@@ -69,12 +69,26 @@ background-color: black;
     }
 }
 
-const TOWER_PNG: &'static [u8] = include_bytes!("../assets/tower.png");
+const TOWER_PNG: &'static [u8] = include_bytes!("../../assets/tower.png");
 
 #[tokio::main]
 async fn main() {
-    let port_number = get_port_number_from_env_variable();
-    let address = std::net::SocketAddr::from(([0, 0, 0, 0], port_number));
+    let port_number_option = get_port_number_from_env_variable();
+
+    let address = match port_number_option {
+        Some(port_number) => std::net::SocketAddr::from(std::net::SocketAddrV4::new(
+            std::net::Ipv4Addr::new(0, 0, 0, 0),
+            port_number,
+        )),
+        None => std::net::SocketAddr::from(std::net::SocketAddrV6::new(
+            std::net::Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1),
+            8080,
+            0,
+            0,
+        )),
+    };
+
+    println!("http://{}", address);
 
     let listener = tokio::net::TcpListener::bind(address)
         .await
@@ -102,20 +116,19 @@ async fn main() {
 
 /// ポート番号を PORT という名前の環境変数から呼んで返す. 環境変数がなければ デフォルトで 3000 を返す
 /// これは Cloud Run で動かすときに必要になる
-fn get_port_number_from_env_variable() -> u16 {
+fn get_port_number_from_env_variable() -> Option<u16> {
     let port_env = std::env::var("PORT");
-    const DEFAULT_PORT_NUMBER: u16 = 3000;
     match port_env {
         Ok(port_env_as_string) => match std::str::FromStr::from_str(&port_env_as_string) {
-            Ok(port_env_as_int) => port_env_as_int,
+            Ok(port_env_as_int) => Some(port_env_as_int),
             Err(e) => {
                 println!("PORT の 環境変数を見つけることができたが数値として読み取れんかなった PORT={} ParseIntError={}", port_env_as_string, e);
-                DEFAULT_PORT_NUMBER
+                None
             }
         },
         Err(e) => {
             println!("PORT の 環境変数がなかった. VarError={}", e);
-            DEFAULT_PORT_NUMBER
+            None
         }
     }
 }

@@ -17,14 +17,7 @@ async fn request(secret_key: &str, query: &Expr) -> anyhow::Result<serde_json::v
     let client = reqwest::Client::new();
     let string = client
         .post("https://db.us.fauna.com")
-        .header(
-            reqwest::header::AUTHORIZATION,
-            format!(
-                "{} {}",
-                http_types::auth::AuthenticationScheme::Bearer,
-                secret_key
-            ),
-        )
+        .bearer_auth(secret_key)
         .json(&expr_to_json_value(query))
         .send()
         .await?
