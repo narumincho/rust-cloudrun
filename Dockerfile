@@ -6,7 +6,7 @@ COPY . .
 
 RUN cargo build -p server --release --all-features
 
-FROM scratch
+FROM ubuntu:latest
 
 COPY --from=build /workspace/rust-cloudrun/target/release/ /app/
 
