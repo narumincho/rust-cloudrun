@@ -34,7 +34,7 @@ async fn hello_world(
                 hyper::body::Bytes::from("error response"),
             ))),
         }
-    } else if path == "/client_bg.wasm" {
+    } else if path == CLIENT_WASM_BG_PATH {
         match http::Response::builder()
             .header(
                 http::header::CONTENT_TYPE,
