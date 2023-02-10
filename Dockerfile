@@ -10,4 +10,6 @@ FROM scratch
 
 COPY --from=build /workspace/rust-cloudrun/target/release/ /app/
 
+ENV PORT=8000
+
 CMD /app/server
