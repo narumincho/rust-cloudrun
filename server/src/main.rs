@@ -7,7 +7,8 @@ async fn hello_world(
         .uri()
         .path_and_query()
         .expect("パスを解析できなかった");
-    if path_and_query.path() == TOWER_PNG_PATH {
+    let path = path_and_query.path();
+    if path == TOWER_PNG_PATH {
         match http::Response::builder()
             .header(
                 http::header::CONTENT_TYPE,
@@ -15,6 +16,51 @@ async fn hello_world(
             )
             .body(http_body_util::Full::from(TOWER_PNG))
         {
+            Ok(response) => Ok(response),
+            Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
+                hyper::body::Bytes::from("error response"),
+            ))),
+        }
+    } else if path == CLIENT_JS_PATH {
+        match http::Response::builder()
+            .header(
+                http::header::CONTENT_TYPE,
+                http::header::HeaderValue::from_static("text/javascript"),
+            )
+            .body(http_body_util::Full::from(CLIENT_JS))
+        {
+            Ok(response) => Ok(response),
+            Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
+                hyper::body::Bytes::from("error response"),
+            ))),
+        }
+    } else if path == "/client_bg.wasm" {
+        match http::Response::builder()
+            .header(
+                http::header::CONTENT_TYPE,
+                http::header::HeaderValue::from_static("application/wasm"),
+            )
+            .body(http_body_util::Full::from(WASM))
+        {
+            Ok(response) => Ok(response),
+            Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
+                hyper::body::Bytes::from("error response"),
+            ))),
+        }
+    } else if path == "/script" {
+        match http::Response::builder()
+            .header(
+                http::header::CONTENT_TYPE,
+                http::header::HeaderValue::from_static("text/javascript"),
+            )
+            .body(http_body_util::Full::from(format!(
+                "
+import init, {{ greet }} from \"{}\";
+
+init().then(() => {{greet()}});
+",
+                CLIENT_JS_PATH
+            ))) {
             Ok(response) => Ok(response),
             Err(_) => Ok(hyper::Response::new(http_body_util::Full::new(
                 hyper::body::Bytes::from("error response"),
@@ -28,6 +74,7 @@ async fn hello_world(
 <head>
 <meta charset=\"utf-8\">
 <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
+<script type=\"module\" src=\"/script\"></script>
 <style>
 body {{
 font-size: 48px;
@@ -70,6 +117,10 @@ background-color: black;
 }
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../../assets/tower.png");
+
+const CLIENT_JS: &'static [u8] = include_bytes!("../../client/pkg/client.js");
+
+const WASM: &'static [u8] = include_bytes!("../../client/pkg/client_bg.wasm");
 
 #[tokio::main]
 async fn main() {
@@ -134,6 +185,10 @@ fn get_port_number_from_env_variable() -> Option<u16> {
 }
 
 const TOWER_PNG_PATH: &'static str = static_macro::tower_png_path!();
+
+const CLIENT_JS_PATH: &'static str = static_macro::client_js_path!();
+
+const CLIENT_WASM_BG_PATH: &'static str = static_macro::client_wasm_bg_path!();
 
 static_macro::custom!();
 
