@@ -4,6 +4,8 @@ WORKDIR /workspace/rust-cloudrun/
 
 COPY . .
 
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
 RUN cargo run -p client_build
 
 RUN cargo build -p server --release --all-features
