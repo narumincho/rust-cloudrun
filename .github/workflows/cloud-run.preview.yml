@@ -19,14 +19,14 @@ jobs:
           service_account: github-actions@webauthn-test-373907.iam.gserviceaccount.com
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@main
+        uses: google-github-actions/setup-gcloud@v1
 
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
       - name: install-wasmpack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash
 
       - uses: actions-rs/cargo@v1
         with:
