@@ -46,5 +46,6 @@ jobs:
           --platform managed
           --allow-unauthenticated
           --source .
+          --region us-central1
           --tag pr-${{ github.event.pull_request.number }}
           --no-traffic
