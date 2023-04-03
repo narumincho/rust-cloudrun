@@ -1,0 +1,45 @@
+name: Cloud Run (Preview)
+
+on: pull_request
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [product-x]
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Create docker image url
+        id: image-url
+        run: echo "::set-output name=value::gcr.io/${{ secrets.DEV_GCP_PROJECT_ID }}/${{ matrix.service }}-service:${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}"
+
+      - name: Build image
+        run: docker build -t ${{ steps.image-url.outputs.value }} -f ./docker/development/Dockerfile .
+
+      - id: "auth"
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/911250965130/locations/global/workloadIdentityPools/github-actions-id-pool/providers/github
+          service_account: github-actions@webauthn-test-373907.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@main
+
+      - name: Configure docker to use the gcloud cli
+        run: gcloud auth configure-docker --quiet
+
+      - name: Push image
+        run: docker push ${{ steps.image-url.outputs.value }}
+
+      - name: Deploy revision with tag
+        run: >
+          gcloud run deploy ${{ matrix.service }}
+          --platform managed
+          --region ${{ secrets.GCP_REGION }}
+          --image ${{ steps.image-url.outputs.value }}
+          --tag pr-${{ github.event.pull_request.number }}
+          --no-traffic
