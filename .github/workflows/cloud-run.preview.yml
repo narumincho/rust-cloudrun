@@ -1,0 +1,45 @@
+name: Cloud Run (Preview)
+
+on: pull_request
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@main
+
+      - id: "auth"
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/911250965130/locations/global/workloadIdentityPools/github-actions-id-pool/providers/github
+          service_account: github-actions@webauthn-test-373907.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@main
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: install-wasmpack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: -p client_build
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p server --release --all-features
+
+      - name: Deploy revision with tag
+        run: >
+          gcloud run deploy rust-preview
+          --platform managed
+          --allow-unauthenticated
+          --source .
+          --tag pr-${{ github.event.pull_request.number }}
+          --no-traffic
