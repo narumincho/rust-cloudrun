@@ -6,19 +6,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        service: [product-x]
-
     steps:
       - uses: actions/checkout@main
-
-      - name: Create docker image url
-        id: image-url
-        run: echo "::set-output name=value::gcr.io/${{ secrets.DEV_GCP_PROJECT_ID }}/${{ matrix.service }}-service:${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}"
-
-      - name: Build image
-        run: docker build -t ${{ steps.image-url.outputs.value }} .
 
       - id: "auth"
         uses: google-github-actions/auth@v1
@@ -29,17 +18,28 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@main
 
-      - name: Configure docker to use the gcloud cli
-        run: gcloud auth configure-docker --quiet
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
 
-      - name: Push image
-        run: docker push ${{ steps.image-url.outputs.value }}
+      - name: install-wasmpack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: -p client_build
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p server --release --all-features
 
       - name: Deploy revision with tag
         run: >
-          gcloud run deploy ${{ matrix.service }}
+          gcloud run deploy rust-preview
           --platform managed
           --allow-unauthenticated
-          --image ${{ steps.image-url.outputs.value }}
+          --source .
           --tag pr-${{ github.event.pull_request.number }}
           --no-traffic
