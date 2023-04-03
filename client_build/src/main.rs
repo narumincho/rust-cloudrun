@@ -1,15 +1,20 @@
 pub fn main() -> anyhow::Result<()> {
-    let output = std::process::Command::new(if cfg!(target_os = "windows") {
-        "powershell"
+    let output = if cfg!(target_os = "windows") {
+        std::process::Command::new("powershell")
+            .arg("wasm-pack")
+            .arg("build")
+            .arg("./client")
+            .arg("--target")
+            .arg("web")
+            .output()?
     } else {
-        "bash"
-    })
-    .arg("wasm-pack")
-    .arg("build")
-    .arg("./client")
-    .arg("--target")
-    .arg("web")
-    .output()?;
+        std::process::Command::new("wasm-pack")
+            .arg("build")
+            .arg("./client")
+            .arg("--target")
+            .arg("web")
+            .output()?
+    };
 
     println!("stdout: {}", std::str::from_utf8(&output.stdout)?);
     println!("stderr: {}", std::str::from_utf8(&output.stderr)?);
