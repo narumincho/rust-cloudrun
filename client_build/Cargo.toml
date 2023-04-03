@@ -5,5 +5,5 @@ authors = ["narumincho"]
 edition = "2018"
 
 [dependencies]
-anyhow = "1.0.69"
+anyhow = "1.0.70"
 sha2 = "0.10.6"
