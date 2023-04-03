@@ -15,5 +15,5 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("Hello, hello-wasm!");
+    alert("Rustで書いたコード (wasmに変換し実行している)");
 }
