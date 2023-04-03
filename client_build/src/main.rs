@@ -2,7 +2,7 @@ pub fn main() -> anyhow::Result<()> {
     let output = std::process::Command::new(if cfg!(target_os = "windows") {
         "powershell"
     } else {
-        "sh"
+        "bash"
     })
     .arg("wasm-pack")
     .arg("build")

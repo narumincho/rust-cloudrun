@@ -28,6 +28,8 @@ jobs:
       - name: install-wasmpack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash
 
+      - run: wasm-pack --help
+
       - uses: actions-rs/cargo@v1
         with:
           command: run
