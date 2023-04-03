@@ -4,6 +4,8 @@ WORKDIR /workspace/rust-cloudrun/
 
 COPY . .
 
+RUN cargo run -p client_build
+
 RUN cargo build -p server --release --all-features
 
 FROM ubuntu:latest
