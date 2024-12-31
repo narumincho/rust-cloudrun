@@ -21,11 +21,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      - name: install-wasmpack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash
-
-      - run: wasm-pack --help
-
       - run: cargo --version
 
       - run: cargo run -p client_build
