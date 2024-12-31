@@ -1,7 +1,7 @@
 use once_cell::sync::Lazy;
 
 async fn hello_world(
-    request: http::Request<hyper::body::Incoming>,
+    request: hyper::http::Request<hyper::body::Incoming>,
 ) -> Result<hyper::Response<http_body_util::Full<hyper::body::Bytes>>, std::convert::Infallible> {
     let path_and_query = request
         .uri()
@@ -9,10 +9,10 @@ async fn hello_world(
         .expect("パスを解析できなかった");
     let path = path_and_query.path();
     if path == TOWER_PNG_PATH {
-        match http::Response::builder()
+        match hyper::http::Response::builder()
             .header(
-                http::header::CONTENT_TYPE,
-                http::header::HeaderValue::from_static("image/png"),
+                hyper::http::header::CONTENT_TYPE,
+                hyper::http::header::HeaderValue::from_static("image/png"),
             )
             .body(http_body_util::Full::from(TOWER_PNG))
         {
@@ -22,10 +22,10 @@ async fn hello_world(
             ))),
         }
     } else if path == CLIENT_JS_PATH {
-        match http::Response::builder()
+        match hyper::http::Response::builder()
             .header(
-                http::header::CONTENT_TYPE,
-                http::header::HeaderValue::from_static("text/javascript"),
+                hyper::http::header::CONTENT_TYPE,
+                hyper::http::header::HeaderValue::from_static("text/javascript"),
             )
             .body(http_body_util::Full::from(CLIENT_JS))
         {
@@ -35,10 +35,10 @@ async fn hello_world(
             ))),
         }
     } else if path == CLIENT_WASM_BG_PATH {
-        match http::Response::builder()
+        match hyper::http::Response::builder()
             .header(
-                http::header::CONTENT_TYPE,
-                http::header::HeaderValue::from_static("application/wasm"),
+                hyper::http::header::CONTENT_TYPE,
+                hyper::http::header::HeaderValue::from_static("application/wasm"),
             )
             .body(http_body_util::Full::from(WASM))
         {
@@ -48,10 +48,10 @@ async fn hello_world(
             ))),
         }
     } else if path == "/script" {
-        match http::Response::builder()
+        match hyper::http::Response::builder()
             .header(
-                http::header::CONTENT_TYPE,
-                http::header::HeaderValue::from_static("text/javascript"),
+                hyper::http::header::CONTENT_TYPE,
+                hyper::http::header::HeaderValue::from_static("text/javascript"),
             )
             .body(http_body_util::Full::from(format!(
                 "
@@ -101,10 +101,10 @@ background-color: black;
             uuid::Uuid::new_v4(),
             TOWER_PNG_PATH
         );
-        match http::Response::builder()
+        match hyper::http::Response::builder()
             .header(
-                http::header::CONTENT_TYPE,
-                http::header::HeaderValue::from_static("text/html"),
+                hyper::http::header::CONTENT_TYPE,
+                hyper::http::header::HeaderValue::from_static("text/html"),
             )
             .body(http_body_util::Full::from(html))
         {
@@ -151,12 +151,14 @@ async fn main() {
             .await
             .expect("tcp のストリーム読み取り時にエラー");
 
+        let io = hyper_util::rt::TokioIo::new(stream);
+
         // Spawn a tokio task to serve multiple connections concurrently
         tokio::task::spawn(async move {
             // Finally, we bind the incoming connection to our `hello` service
             if let Err(err) = hyper::server::conn::http1::Builder::new()
                 // `service_fn` converts our function in a `Service`
-                .serve_connection(stream, hyper::service::service_fn(hello_world))
+                .serve_connection(io, hyper::service::service_fn(hello_world))
                 .await
             {
                 println!("Error serving connection: {:?}", err);

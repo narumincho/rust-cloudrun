@@ -21,24 +21,18 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
       - name: install-wasmpack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | bash
 
       - run: wasm-pack --help
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: -p client_build
+      - run: cargo --version
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p server --release --all-features
+      - run: cargo run -p client_build
+
+      - run: cargo build -p server --release --all-features
+
+      - run: ls ./target/release
 
       - name: Deploy revision with tag
         run: >
