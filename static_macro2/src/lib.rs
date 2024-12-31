@@ -80,36 +80,3 @@ mod tests {
         assert_eq!((*crate::ATTRIBUTES).len(), 2)
     }
 }
-
-pub fn tower_png_path() -> proc_macro2::TokenStream {
-    let path: String = {
-        use sha2::Digest;
-        let mut sha256 = sha2::Sha256::new();
-        sha256.update(include_bytes!("../../assets/tower.png"));
-        format!("/{:x}", sha256.finalize())
-    };
-
-    quote::quote!(#path)
-}
-
-pub fn client_js_path() -> proc_macro2::TokenStream {
-    let path: String = {
-        use sha2::Digest;
-        let mut sha256 = sha2::Sha256::new();
-        sha256.update(include_bytes!("../../client/pkg/client.js"));
-        format!("/{:x}", sha256.finalize())
-    };
-
-    quote::quote!(#path)
-}
-
-pub fn client_wasm_bg_path() -> proc_macro2::TokenStream {
-    let path: String = {
-        use sha2::Digest;
-        let mut sha256 = sha2::Sha256::new();
-        sha256.update(include_bytes!("../../client/pkg/client_bg.wasm"));
-        format!("/{:x}", sha256.finalize())
-    };
-
-    quote::quote!(#path)
-}

@@ -118,9 +118,9 @@ background-color: black;
 
 const TOWER_PNG: &'static [u8] = include_bytes!("../../assets/tower.png");
 
-const CLIENT_JS: &'static [u8] = include_bytes!("../../client/pkg/client.js");
+const CLIENT_JS: &'static [u8] = include_bytes!("../../client_dist/client.js");
 
-const WASM: &'static [u8] = include_bytes!("../../client/pkg/client_bg.wasm");
+const WASM: &'static [u8] = include_bytes!("../../client_dist/client_bg.wasm");
 
 #[tokio::main]
 async fn main() {
@@ -186,11 +186,11 @@ fn get_port_number_from_env_variable() -> Option<u16> {
     }
 }
 
-const TOWER_PNG_PATH: &'static str = static_macro::tower_png_path!();
+const TOWER_PNG_PATH: &'static str = include_str!("../../client_dist/assets/tower.png.hash.txt");
 
-const CLIENT_JS_PATH: &'static str = static_macro::client_js_path!();
+const CLIENT_JS_PATH: &'static str = include_str!("../../client_dist/client.js.hash.txt");
 
-const CLIENT_WASM_BG_PATH: &'static str = static_macro::client_wasm_bg_path!();
+const CLIENT_WASM_BG_PATH: &'static str = include_str!("../../client_dist/client_bg.wasm.hash.txt");
 
 static_macro::custom!();
 
